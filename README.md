@@ -32,6 +32,9 @@ O sistema é composto por dois microserviços principais:
 - **xUnit** para testes unitários
 - **Moq.AutoMock** para mocks em testes
 - **FluentAssertions** para assertions mais legíveis
+- **MSMQ/Masstransit** para mensageria
+
+Outros
 - **Dapper** para acesso a dados (Não funcional, apenas para efeito de avaliação)
 - **SQL Server LocalDB** (Não funcional, apenas para efeito de avaliação)
 
@@ -49,6 +52,7 @@ O sistema é composto por dois microserviços principais:
 
 - .NET 8 SDK
 - SQL Server LocalDB (Não funcional, apenas para efeito de avaliação)
+- Habilitar o MSMQ no Windows
 
 ## Como Executar
 
