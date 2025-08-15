@@ -93,7 +93,15 @@ public class InMemoryProposalRepository : IProposalRepository
                 "Seguro Empresarial",
                 5000.00m,
                 ProposalStatus.UnderAnalysis,
-                baseDate.AddDays(20))
+                baseDate.AddDays(20)),
+
+            new Proposal(
+                Guid.Parse("66666666-6666-6666-6666-666666666666"),
+                "Lorian Bressan",
+                "Seguro Empresarial",
+                10000.00m,
+                ProposalStatus.Approved,
+                baseDate.AddDays(2))
         ]);
     }
 }

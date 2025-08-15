@@ -1,5 +1,6 @@
 using ContractingService.Domain.Entities;
 using ContractingService.Domain.Interfaces;
+using ProposalService.Domain.Entities;
 
 namespace ContractingService.Infrastructure.Repositories;
 
@@ -61,7 +62,15 @@ public class InMemoryContractRepository : IContractRepository
                 "Ana Costa",
                 "Seguro Auto",
                 1800.00m,
-                baseDate.AddDays(5))
+                baseDate.AddDays(5)),
+
+            new Contract(
+                Guid.Parse("cccccccc-cccc-cccc-cccc-cccccccccccc"),
+                Guid.Parse("66666666-6666-6666-6666-666666666666"), // Lorian Bressan - Aprovada
+                "Lorian Bressan",
+                "Seguro Empresarial",
+                10000.00m,
+                baseDate.AddDays(2))
         ]);
     }
 }
