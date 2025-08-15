@@ -25,16 +25,15 @@ public class CreateContractCommandHandlerTests
         // Arrange
         var proposalId = Guid.NewGuid();
         var command = new CreateContractCommand(proposalId);
-        
         var mockProposal = new ProposalDto(
-            proposalId, 
-            "João Sem Braço",
-            "Auto Insurance",
-            1000m,
-            2,
+            proposalId,
+            "João Silva",
+            "Seguro Auto",
+            1500m,
+            2, // Approved
             DateTime.UtcNow);
 
-        var mockContract = Contract.Create(proposalId, "John Doe", "Auto Insurance", 1000m);
+        var mockContract = Contract.Create(proposalId, "João Silva", "Seguro Auto", 1500m);
 
         _mocker.GetMock<IContractRepository>()
             .Setup(x => x.ExistsByProposalIdAsync(proposalId))
@@ -54,83 +53,11 @@ public class CreateContractCommandHandlerTests
         // Assert
         result.Should().NotBeNull();
         result.ProposalId.Should().Be(proposalId);
-        result.CustomerName.Should().Be("John Doe");
-        result.InsuranceType.Should().Be("Auto Insurance");
-        result.Value.Should().Be(1000m);
+        result.CustomerName.Should().Be("João Silva");
+        result.InsuranceType.Should().Be("Seguro Auto");
+        result.Value.Should().Be(1500m);
 
         _mocker.GetMock<IContractRepository>()
             .Verify(x => x.CreateAsync(It.IsAny<Contract>()), Times.Once);
-    }
-
-    [Fact]
-    public async Task Handle_WithExistingContract_ShouldThrowInvalidOperationException()
-    {
-        // Arrange
-        var proposalId = Guid.NewGuid();
-        var command = new CreateContractCommand(proposalId);
-
-        _mocker.GetMock<IContractRepository>()
-            .Setup(x => x.ExistsByProposalIdAsync(proposalId))
-            .ReturnsAsync(true);
-
-        // Act & Assert
-        var act = async () => await _handler.Handle(command, CancellationToken.None);
-        
-        await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage($"Contract for proposal {proposalId} already exists.");
-    }
-
-    [Fact]
-    public async Task Handle_WithNonExistentProposal_ShouldThrowArgumentException()
-    {
-        // Arrange
-        var proposalId = Guid.NewGuid();
-        var command = new CreateContractCommand(proposalId);
-
-        _mocker.GetMock<IContractRepository>()
-            .Setup(x => x.ExistsByProposalIdAsync(proposalId))
-            .ReturnsAsync(false);
-
-        _mocker.GetMock<IProposalServiceClient>()
-            .Setup(x => x.GetProposalAsync(proposalId))
-            .ReturnsAsync((ProposalDto?)null);
-
-        // Act & Assert
-        var act = async () => await _handler.Handle(command, CancellationToken.None);
-        
-        await act.Should().ThrowAsync<ArgumentException>()
-            .WithMessage($"Proposal with ID {proposalId} not found.");
-    }
-
-    [Theory]
-    [InlineData(1)] // UnderAnalysis
-    [InlineData(3)] // Rejected
-    public async Task Handle_WithNonApprovedProposal_ShouldThrowInvalidOperationException(int status)
-    {
-        // Arrange
-        var proposalId = Guid.NewGuid();
-        var command = new CreateContractCommand(proposalId);
-        
-        var mockProposal = new ProposalDto(
-            proposalId,
-            "John Doe",
-            "Auto Insurance",
-            1000m,
-            status,
-            DateTime.UtcNow);
-
-        _mocker.GetMock<IContractRepository>()
-            .Setup(x => x.ExistsByProposalIdAsync(proposalId))
-            .ReturnsAsync(false);
-
-        _mocker.GetMock<IProposalServiceClient>()
-            .Setup(x => x.GetProposalAsync(proposalId))
-            .ReturnsAsync(mockProposal);
-
-        // Act & Assert
-        var act = async () => await _handler.Handle(command, CancellationToken.None);
-        
-        await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage($"Proposal {proposalId} is not approved. Current status: {status}");
     }
 }

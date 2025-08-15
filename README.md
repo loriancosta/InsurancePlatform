@@ -26,14 +26,14 @@ O sistema é composto por dois microserviços principais:
 
 - **.NET 8**
 - **C# 12** com padrões modernos (collection expressions, primary constructors, file-scoped namespaces)
-- **Dapper** para acesso a dados
-- **SQL Server LocalDB**
 - **MediatR** para CQRS
 - **FluentValidation** para validação
 - **Swagger/OpenAPI** para documentação
 - **xUnit** para testes unitários
 - **Moq.AutoMock** para mocks em testes
 - **FluentAssertions** para assertions mais legíveis
+- **Dapper** para acesso a dados (Não funcional, apenas para efeito de avaliação)
+- **SQL Server LocalDB** (Não funcional, apenas para efeito de avaliação)
 
 ## Padrões Implementados
 
@@ -48,46 +48,23 @@ O sistema é composto por dois microserviços principais:
 ## Pré-requisitos
 
 - .NET 8 SDK
-- SQL Server LocalDB (incluído no Visual Studio)
-- Visual Studio 2022 ou VS Code
+- SQL Server LocalDB (Não funcional, apenas para efeito de avaliação)
 
 ## Como Executar
 
 ### 1. Configurar o Banco de Dados
 
-Execute o script SQL localizado em `ProposalService.Infrastructure/Scripts/CreateTables.sql` no SQL Server Management Studio ou execute via comando:
-
-```bash
-sqlcmd -S "(localdb)\mssqllocaldb" -i "ProposalService.Infrastructure/Scripts/CreateTables.sql"
-```
+O banco de dados foi criado em memória para fins de exemplificar o funcionamento
+Portanto, não há necessidade de criarbanco de dados
 
 ### 2. Executar os Microserviços
 
 #### ProposalService
-```bash
-cd ProposalService.API
-dotnet run
-```
-- Swagger: https://localhost:7001/swagger
-
-#### ContractingService
-```bash
-cd ContractingService.API
-dotnet run --urls "https://localhost:7002;http://localhost:5002"
-```
 - Swagger: https://localhost:7002/swagger
 
-### 3. Executar Testes
+#### ContractingService
+- Swagger: https://localhost:7001/swagger
 
-```bash
-# Testes do ProposalService
-cd ProposalService.Tests
-dotnet test
-
-# Testes do ContractingService
-cd ContractingService.Tests
-dotnet test
-```
 
 ## Fluxo de Uso
 
@@ -159,87 +136,10 @@ InsurancePlatform/
 
 ## Configurações
 
-### Connection Strings
-Ambos os serviços usam a mesma connection string no `appsettings.json`:
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=InsurancePlatform;Trusted_Connection=true;MultipleActiveResultSets=true"
-  }
-}
-```
-
-### Comunicação entre Microserviços
-
-**NOTA IMPORTANTE:** O sistema implementa **DUAS abordagens de comunicação** para fins de **demonstração e comparação**:
-
-#### 1. **HTTP REST** (Abordagem Principal)
-O ContractingService se comunica com o ProposalService via HTTP:
-```json
-{
-  "ProposalService": {
-    "BaseUrl": "https://localhost:7001"
-  }
-}
-```
-
 #### 2. **Mensageria** (Exemplo Demonstrativo)
-Comunicação assíncrona via RabbitMQ usando MassTransit:
-- **ProposalStatusRequest** → Solicita verificação de status
-- **ProposalStatusResponse** → Retorna dados da proposta
-- **Configuração:** RabbitMQ rodando em `localhost:5672`
+Comunicação assíncrona via MSMQ usando MassTransit:
 
-**⚠️ AVISO:** A implementação de mensageria é mantida **em paralelo** ao HTTP REST para **fins de teste e demonstração** de diferentes padrões arquiteturais. Em um ambiente de produção, recomenda-se escolher uma abordagem principal.
 
 ## Exemplos de Teste
 
 O sistema inclui testes unitários abrangentes usando Moq.AutoMock:
-
-```csharp
-[Fact]
-public async Task Handle_WithValidApprovedProposal_ShouldCreateContract()
-{
-    // Arrange
-    var proposalId = Guid.NewGuid();
-    var command = new CreateContractCommand(proposalId);
-    
-    // Mock setup using AutoMocker
-    _mocker.GetMock<IProposalServiceClient>()
-        .Setup(x => x.GetProposalAsync(proposalId))
-        .ReturnsAsync(mockProposal);
-
-    // Act
-    var result = await _handler.Handle(command, CancellationToken.None);
-
-    // Assert
-    result.Should().NotBeNull();
-    result.ProposalId.Should().Be(proposalId);
-}
-```
-
-## Funcionalidades Implementadas
-
-✅ Arquitetura Hexagonal  
-✅ Microserviços com APIs REST  
-✅ Banco de dados SQL Server com Dapper  
-✅ CQRS com MediatR  
-✅ Validação com FluentValidation  
-✅ Testes unitários com Moq.AutoMock  
-✅ Comunicação HTTP entre microserviços  
-✅ **Mensageria com MassTransit/RabbitMQ** (exemplo demonstrativo)  
-✅ Swagger/OpenAPI documentation  
-✅ Clean Code e SOLID principles  
-✅ Records imutáveis para DTOs  
-✅ Padrões C# 12 modernos  
-
-## Próximos Passos (Melhorias Futuras)
-
-- [ ] Docker containers
-- [ ] Mensageria (RabbitMQ/Azure Service Bus)
-- [ ] Testes de integração
-- [ ] Logging estruturado (Serilog)
-- [ ] Health checks
-- [ ] API Gateway
-- [ ] Autenticação/Autorização
-- [ ] Circuit Breaker pattern
-- [ ] Retry policies
