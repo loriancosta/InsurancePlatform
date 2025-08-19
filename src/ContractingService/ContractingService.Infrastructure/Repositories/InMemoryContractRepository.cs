@@ -10,7 +10,7 @@ public class InMemoryContractRepository : IContractRepository
 
     public InMemoryContractRepository()
     {
-        SeedData();
+        SeedData(); // <-- Insere alguns dados para testes
     }
 
     public Task<Contract> CreateAsync(Contract contract)
@@ -39,7 +39,7 @@ public class InMemoryContractRepository : IContractRepository
 
     public Task<bool> ExistsByProposalIdAsync(Guid proposalId)
     {
-        var exists = _contracts.Any(c => c.ProposalId == proposalId);
+        var exists = _contracts.Exists(c => c.ProposalId == proposalId);
         return Task.FromResult(exists);
     }
 

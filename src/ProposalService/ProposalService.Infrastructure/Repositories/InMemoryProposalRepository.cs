@@ -10,7 +10,7 @@ public class InMemoryProposalRepository : IProposalRepository
 
     public InMemoryProposalRepository()
     {
-        SeedData();
+        SeedData(); // <-- Insere alguns dados para testes
     }
 
     public Task<Proposal> CreateAsync(Proposal proposal)

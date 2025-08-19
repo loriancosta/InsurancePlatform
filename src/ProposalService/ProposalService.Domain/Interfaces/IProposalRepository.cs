@@ -1,5 +1,4 @@
 using ProposalService.Domain.Entities;
-using ProposalService.Domain.Enums;
 
 namespace ProposalService.Domain.Interfaces;
 

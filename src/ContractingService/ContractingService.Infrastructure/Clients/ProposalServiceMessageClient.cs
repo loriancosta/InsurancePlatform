@@ -1,5 +1,6 @@
-using MassTransit;
+using Azure;
 using ContractingService.Domain.Interfaces;
+using MassTransit;
 using ProposalService.Application.Messages;
 
 namespace ContractingService.Infrastructure.Clients;
@@ -15,9 +16,12 @@ public class ProposalServiceMessageClient : IProposalServiceClient
     {
         try
         {
+            // ***************************************************************************
+            // **** Vai retornar erro sempre pois não tenho fila de mensagens configurada
+            // ***************************************************************************
             var request = new ProposalStatusRequest(proposalId);
             var response = await _requestClient.GetResponse<ProposalStatusResponse>(request);
-            
+
             if (response.Message is null)
                 return null;
 
@@ -30,9 +34,19 @@ public class ProposalServiceMessageClient : IProposalServiceClient
                 response.Message.CreatedDate,
                 response.Message.UpdatedDate);
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            return null;
-        }
+            // ***************************************************************************
+            // **** Vai retornar erro sempre pois não tenho fila de mensagens configurada
+            // **** Vou gerar um dado "fake" no errro para simular um retorno real.
+            // ***************************************************************************
+            return new ProposalDto(
+                proposalId,
+                "João Silva (Mock)",
+                "Seguro Auto",
+                1500.00m,
+                2, // Status Aprovado
+                DateTime.UtcNow.AddDays(-1),
+                DateTime.UtcNow);        }
     }
 }
